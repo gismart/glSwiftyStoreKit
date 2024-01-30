@@ -1,0 +1,32 @@
+import_from_git(
+  url: "git@github.com:gismart/lanes_ios.git",
+  branch: "master",
+  path: "podspec_lanes.rb" 
+)
+
+default_platform :ios
+
+platform :ios do
+  unlock_keychain(
+    path: 'login.keychain-db',
+    password: '7Gk8ooje'
+  )
+
+  pod_name = "glSwiftyStoreKit"
+  podspec_path = "./../#{pod_name}.podspec"
+  swift_version = "5.7"
+
+  lane :pod_release do
+    podspec_release(
+      podspec_path: podspec_path,
+      swift_version: swift_version
+    )
+  end
+
+  lane :pod_validate do
+    validate_podspec(
+      podspec_path: podspec_path,
+      swift_version: swift_version
+    )
+  end
+end
