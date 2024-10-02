@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'glSwiftyStoreKit'
-  s.version      = '0.17.0'
+  s.version      = '0.17.1'
   s.summary      = 'Lightweight In App Purchases Swift framework for iOS, tvOS, watchOS, macOS and Mac Catalyst.'
   s.license      = 'MIT'
   s.author       = { 'Gismart' => 'info@gismart.com' }

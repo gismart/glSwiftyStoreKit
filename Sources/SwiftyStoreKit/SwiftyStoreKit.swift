@@ -284,6 +284,11 @@ extension SwiftyStoreKit {
         return InAppReceipt.verifyPurchase(productId: productId, inReceipt: receipt)
     }
     
+    public class func verifyPurchaseIncludingCancelled(productId: String, inReceipt receipt: ReceiptInfo) -> VerifyPurchaseResult {
+        
+        return InAppReceipt.verifyPurchaseIncludingCancelled(productId: productId, inReceipt: receipt)
+    }
+    
     /**
      *  Verify the validity of a subscription (auto-renewable, free or non-renewing) in a receipt.
      *
@@ -297,6 +302,11 @@ extension SwiftyStoreKit {
     public class func verifySubscription(ofType type: SubscriptionType, productId: String, inReceipt receipt: ReceiptInfo, validUntil date: Date = Date()) -> VerifySubscriptionResult {
         
         return InAppReceipt.verifySubscriptions(ofType: type, productIds: [productId], inReceipt: receipt, validUntil: date)
+    }
+    
+    public class func verifySubscriptionIncludingCancelled(ofType type: SubscriptionType, productId: String, inReceipt receipt: ReceiptInfo, validUntil date: Date = Date()) -> VerifySubscriptionResult {
+        
+        return InAppReceipt.verifySubscriptionsIncludingCancelled(ofType: type, productIds: [productId], inReceipt: receipt, validUntil: date)
     }
     
     /**
@@ -314,6 +324,11 @@ extension SwiftyStoreKit {
     public class func verifySubscriptions(ofType type: SubscriptionType = .autoRenewable, productIds: Set<String>, inReceipt receipt: ReceiptInfo, validUntil date: Date = Date()) -> VerifySubscriptionResult {
         
         return InAppReceipt.verifySubscriptions(ofType: type, productIds: productIds, inReceipt: receipt, validUntil: date)
+    }
+    
+    public class func verifySubscriptionsIncludingCancelled(ofType type: SubscriptionType = .autoRenewable, productIds: Set<String>, inReceipt receipt: ReceiptInfo, validUntil date: Date = Date()) -> VerifySubscriptionResult {
+        
+        return InAppReceipt.verifySubscriptionsIncludingCancelled(ofType: type, productIds: productIds, inReceipt: receipt, validUntil: date)
     }
     
     ///  Get the distinct product identifiers from receipt.
