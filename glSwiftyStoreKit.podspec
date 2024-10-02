@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'glSwiftyStoreKit'
-  s.version      = '0.16.4'
+  s.version      = '0.17.0'
   s.summary      = 'Lightweight In App Purchases Swift framework for iOS, tvOS, watchOS, macOS and Mac Catalyst.'
   s.license      = 'MIT'
   s.author       = { 'Gismart' => 'info@gismart.com' }
@@ -11,4 +11,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Sources/SwiftyStoreKit/*.{swift}'
   s.screenshots  = ["https://github.com/gismart/glSwiftyStoreKit/raw/master/Screenshots/Preview.jpg"]
   s.requires_arc = true
+  s.resource_bundles = {
+    'glswiftystorekit' => ['Sources/PrivacyInfo.xcprivacy']
+  }
 end
