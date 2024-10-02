@@ -114,6 +114,28 @@ internal class InAppReceipt {
         }
         return .notPurchased
     }
+    
+    class func verifyPurchaseIncludingCancelled(
+        productId: String,
+        inReceipt receipt: ReceiptInfo
+    ) -> VerifyPurchaseResult {
+
+        // Get receipts info for the product
+        let receipts = getInAppReceipts(receipt: receipt)
+        let filteredReceiptsInfo = filterReceiptsInfo(receipts: receipts, withProductIds: [productId])
+
+        #if swift(>=4.1)
+            let receiptItems = filteredReceiptsInfo.compactMap { ReceiptItem(receiptInfo: $0) }
+        #else
+            let receiptItems = filteredReceiptsInfo.flatMap { ReceiptItem(receiptInfo: $0) }
+        #endif
+        
+        // Verify that at least one receipt has the right product id
+        if let firstItem = receiptItems.first {
+            return .purchased(item: firstItem)
+        }
+        return .notPurchased
+    }
 
     /**
      *  Verify the validity of a set of subscriptions in a receipt.
@@ -152,6 +174,48 @@ internal class InAppReceipt {
 
         if nonCancelledReceiptsInfo.count > receiptItems.count {
             print("receipt has \(nonCancelledReceiptsInfo.count) items, but only \(receiptItems.count) were parsed")
+        }
+
+        let sortedExpiryDatesAndItems = expiryDatesAndItems(receiptItems: receiptItems, duration: duration).sorted { a, b in
+            return a.0 > b.0
+        }
+
+        guard let firstExpiryDateItemPair = sortedExpiryDatesAndItems.first else {
+            return .notPurchased
+        }
+
+        let sortedReceiptItems = sortedExpiryDatesAndItems.map { $0.1 }
+        if firstExpiryDateItemPair.0 > receiptDate {
+            return .purchased(expiryDate: firstExpiryDateItemPair.0, items: sortedReceiptItems)
+        } else {
+            return .expired(expiryDate: firstExpiryDateItemPair.0, items: sortedReceiptItems)
+        }
+    }
+    
+    class func verifySubscriptionsIncludingCancelled(
+        ofType type: SubscriptionType,
+        productIds: Set<String>,
+        inReceipt receipt: ReceiptInfo,
+        validUntil date: Date = Date()
+    ) -> VerifySubscriptionResult {
+
+        // The values of the latest_receipt and latest_receipt_info keys are useful when checking whether an auto-renewable subscription is currently active. By providing any transaction receipt for the subscription and checking these values, you can get information about the currently-active subscription period. If the receipt being validated is for the latest renewal, the value for latest_receipt is the same as receipt-data (in the request) and the value for latest_receipt_info is the same as receipt.
+        let (receipts, duration) = getReceiptsAndDuration(for: type, inReceipt: receipt)
+        let receiptsInfo = filterReceiptsInfo(receipts: receipts, withProductIds: productIds)
+        if receiptsInfo.count == 0 {
+            return .notPurchased
+        }
+
+        let receiptDate = getReceiptRequestDate(inReceipt: receipt) ?? date
+
+        #if swift(>=4.1)
+            let receiptItems = receiptsInfo.compactMap { ReceiptItem(receiptInfo: $0) }
+        #else
+            let receiptItems = receiptsInfo.flatMap { ReceiptItem(receiptInfo: $0) }
+        #endif
+
+        if receiptsInfo.count > receiptItems.count {
+            print("receipt has \(receiptsInfo.count) items, but only \(receiptItems.count) were parsed")
         }
 
         let sortedExpiryDatesAndItems = expiryDatesAndItems(receiptItems: receiptItems, duration: duration).sorted { a, b in
